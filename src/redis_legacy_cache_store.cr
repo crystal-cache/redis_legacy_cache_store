@@ -5,7 +5,7 @@ module Cache
   # A cache store implementation which stores data in Redis.
   #
   # ```
-  # cache = Cache::RedisCacheStore(String, String).new(expires_in: 1.minute, namespace: "myapp-cache")
+  # cache = Cache::RedisLegacyCacheStore(String, String).new(expires_in: 1.minute, namespace: "myapp-cache")
   #
   # # Fetches data from the Redis, using "myapp-cache:today" key. If there is data in
   # # the REdis with the given key, then that data is returned.
@@ -26,9 +26,9 @@ module Cache
   #
   # ```
   # redis = Redis.new(host: "10.0.1.1", port: 6380, password: "my-secret-pw", database: 1)
-  # cache = Cache::RedisCacheStore(String, String).new(expires_in: 1.minute, cache: redis)
+  # cache = Cache::RedisLegacyCacheStore(String, String).new(expires_in: 1.minute, cache: redis)
   # ```
-  struct RedisCacheStore(K, V) < Store(K, V)
+  struct RedisLegacyCacheStore(K, V) < Store(K, V)
     @cache : Redis | Redis::PooledClient
 
     # The maximum number of entries to receive per SCAN call.
@@ -42,7 +42,7 @@ module Cache
     # server is shared with other apps:
     #
     # ```
-    # Cache::RedisCacheStore(String, String).new(expires_in: 1.minute, namespace: "myapp-cache")
+    # Cache::RedisLegacyCacheStore(String, String).new(expires_in: 1.minute, namespace: "myapp-cache")
     # ```
     def initialize(@expires_in : Time::Span, @cache = Redis::PooledClient.new, @namespace : String? = nil)
     end
