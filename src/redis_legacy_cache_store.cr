@@ -5,7 +5,7 @@ module Cache
   # A cache store implementation which stores data in Redis.
   #
   # ```
-  # cache = Cache::RedisLegacyCacheStore(String, String).new(expires_in: 1.minute, namespace: "myapp-cache")
+  # cache = Cache::RedisLegacyCacheStore(String).new(expires_in: 1.minute, namespace: "myapp-cache")
   #
   # # Fetches data from the Redis, using "myapp-cache:today" key. If there is data in
   # # the REdis with the given key, then that data is returned.
@@ -26,9 +26,9 @@ module Cache
   #
   # ```
   # redis = Redis.new(host: "10.0.1.1", port: 6380, password: "my-secret-pw", database: 1)
-  # cache = Cache::RedisLegacyCacheStore(String, String).new(expires_in: 1.minute, cache: redis)
+  # cache = Cache::RedisLegacyCacheStore(String).new(expires_in: 1.minute, cache: redis)
   # ```
-  struct RedisLegacyCacheStore(K, V) < Store(K, V)
+  struct RedisLegacyCacheStore(V) < Store(V)
     @cache : Redis | Redis::PooledClient
 
     # The maximum number of entries to receive per SCAN call.
@@ -42,24 +42,24 @@ module Cache
     # server is shared with other apps:
     #
     # ```
-    # Cache::RedisLegacyCacheStore(String, String).new(expires_in: 1.minute, namespace: "myapp-cache")
+    # Cache::RedisLegacyCacheStore(String).new(expires_in: 1.minute, namespace: "myapp-cache")
     # ```
     def initialize(@expires_in : Time::Span, @cache = Redis::PooledClient.new, @namespace : String? = nil)
     end
 
-    private def write_impl(key : K, value : V, *, expires_in = @expires_in)
+    private def write_impl(key : String, value : V, *, expires_in = @expires_in)
       @cache.set(key, value, expires_in.total_seconds.to_i)
     end
 
-    private def read_impl(key : K)
+    private def read_impl(key : String)
       @cache.get(key)
     end
 
-    def delete_impl(key : K) : Bool
+    def delete_impl(key : String) : Bool
       @cache.del(key) == 1_i64
     end
 
-    def exists_impl(key : K) : Bool
+    def exists_impl(key : String) : Bool
       @cache.exists(key) == 1
     end
 
@@ -76,7 +76,7 @@ module Cache
     # Increment a cached value. This method uses the Redis incr atomic operator.
     #
     # Calling it on a value not stored will initialize that value to zero.
-    def increment(key : K, amount = 1)
+    def increment(key : String, amount = 1)
       key = namespace_key(key)
 
       @cache.incrby(key, amount).tap do
@@ -87,7 +87,7 @@ module Cache
     # Decrement a cached value. This method uses the Redis decr atomic operator.
     #
     # Calling it on a value not stored will initialize that value to zero.
-    def decrement(key : K, amount = 1)
+    def decrement(key : String, amount = 1)
       key = namespace_key(key)
 
       @cache.decrby(key, amount).tap do
@@ -95,7 +95,7 @@ module Cache
       end
     end
 
-    private def write_key_expiry(key : K)
+    private def write_key_expiry(key : String)
       @cache.expire(key, @expires_in.total_seconds.to_i)
     end
 
