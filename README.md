@@ -1,6 +1,6 @@
 # Cache::RedisLegacyCacheStore
 
-![Crystal CI](https://github.com/crystal-cache/redis_legacy_cache_store/workflows/Crystal%20CI/badge.svg)
+[![Crystal CI](https://github.com/crystal-cache/redis_legacy_cache_store/actions/workflows/crystal.yml/badge.svg)](https://github.com/crystal-cache/redis_legacy_cache_store/actions/workflows/crystal.yml)
 [![GitHub release](https://img.shields.io/github/release/crystal-cache/redis_legacy_cache_store.svg)](https://github.com/crystal-cache/redis_legacy_cache_store/releases)
 
 A [cache](https://github.com/crystal-cache/cache) store implementation that stores data in Redis.
