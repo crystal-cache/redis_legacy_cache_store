@@ -110,6 +110,8 @@ module Cache
         # Fetch keys in batches using SCAN to avoid blocking the Redis server.
         cursor, keys = @cache.scan(cursor, match: parent, count: SCAN_BATCH_SIZE)
 
+        next if keys.empty?
+
         @cache.del(keys)
 
         break if cursor == "0"
