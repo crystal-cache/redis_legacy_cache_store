@@ -30,8 +30,8 @@ require "redis_legacy_cache_store"
 It's important to note that Redis cache value must be string.
 
 ```crystal
-cache = Cache::RedisLegacyCacheStore(String, String).new(expires_in: 1.minute, namespace: "myapp-cache")
-# => #<Cache::RedisLegacyCacheStore(String, String) redis=#<Redis::PooledClient:0x7f0f1d2cf8c0 @pool=#<ConnectionPool(Redis):0x7f0f1d2e1af0 @r=#<IO::FileDescriptor: fd=11>, @w=#<IO::FileDescriptor: fd=12>, @capacity=5, @timeout=5.0, @buffer=Bytes[0], @size=0, ending=5, @pool=[], @block=#<Proc(Redis):0x562322895dd0:closure>, @connections=nil>> expires_in=00:01:00 namespace="myapp-cache>"
+cache = Cache::RedisLegacyCacheStore(String).new(expires_in: 1.minute, namespace: "myapp-cache")
+# => #<Cache::RedisLegacyCacheStore(String) redis=#<Redis::PooledClient:0x7f0f1d2cf8c0 @pool=#<ConnectionPool(Redis):0x7f0f1d2e1af0 @r=#<IO::FileDescriptor: fd=11>, @w=#<IO::FileDescriptor: fd=12>, @capacity=5, @timeout=5.0, @buffer=Bytes[0], @size=0, ending=5, @pool=[], @block=#<Proc(Redis):0x562322895dd0:closure>, @connections=nil>> expires_in=00:01:00 namespace="myapp-cache>"
 
 # Fetches data from the Redis, using "myapp-cache:today" key. If there is data in
 # the Redis with the given key, then that data is returned.
@@ -56,7 +56,7 @@ If you need to connect to a remote server or a different port, try:
 
 ```crystal
 redis = Redis.new(host: "10.0.1.1", port: 6380, password: "my-secret-pw", database: 1)
-cache = Cache::RedisLegacyCacheStore(String, String).new(expires_in: 1.minute, cache: redis)
+cache = Cache::RedisLegacyCacheStore(String).new(expires_in: 1.minute, cache: redis)
 ```
 
 ## Contributing

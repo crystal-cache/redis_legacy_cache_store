@@ -9,68 +9,68 @@ describe Cache do
 
     context "#initialize" do
       it "initialize" do
-        store = Cache::RedisLegacyCacheStore(String, String).new(expires_in: 12.hours)
+        store = Cache::RedisLegacyCacheStore(String).new(expires_in: 12.hours)
 
-        store.should be_a(Cache::RedisLegacyCacheStore(String, String))
+        store.should be_a(Cache::RedisLegacyCacheStore(String))
       end
 
       it "initialize with Redis" do
         redis = Redis.new(host: "localhost", port: 6379)
-        store = Cache::RedisLegacyCacheStore(String, String).new(expires_in: 12.hours, cache: redis)
+        store = Cache::RedisLegacyCacheStore(String).new(expires_in: 12.hours, cache: redis)
 
-        store.should be_a(Cache::RedisLegacyCacheStore(String, String))
+        store.should be_a(Cache::RedisLegacyCacheStore(String))
       end
 
       it "initialize with Redis::PooledClient" do
         redis = Redis::PooledClient.new(host: "localhost", port: 6379, pool_size: 20)
-        store = Cache::RedisLegacyCacheStore(String, String).new(expires_in: 12.hours, cache: redis)
+        store = Cache::RedisLegacyCacheStore(String).new(expires_in: 12.hours, cache: redis)
 
-        store.should be_a(Cache::RedisLegacyCacheStore(String, String))
+        store.should be_a(Cache::RedisLegacyCacheStore(String))
       end
     end
 
     context "instance methods" do
       it "#inspect without namescape" do
-        store = Cache::RedisLegacyCacheStore(String, String).new(expires_in: 12.hours)
+        store = Cache::RedisLegacyCacheStore(String).new(expires_in: 12.hours)
 
         store.inspect.should match(
-          /\A#<Cache\:\:RedisLegacyCacheStore\(String, String\) redis=#<Redis\:\:PooledClient\:0x.*expires_in=12:00:00.*namespace=nil>\z/
+          /\A#<Cache\:\:RedisLegacyCacheStore\(String\) redis=#<Redis\:\:PooledClient\:0x.*expires_in=12:00:00.*namespace=nil>\z/
         )
       end
 
       it "#inspect with namescape" do
-        store = Cache::RedisLegacyCacheStore(String, String).new(expires_in: 12.hours, namespace: "myapp-cache")
+        store = Cache::RedisLegacyCacheStore(String).new(expires_in: 12.hours, namespace: "myapp-cache")
 
         store.inspect.should match(
-          /\A#<Cache\:\:RedisLegacyCacheStore\(String, String\) redis=#<Redis\:\:PooledClient\:0x.*expires_in=12:00:00.*namespace=\"myapp-cache\">\z/
+          /\A#<Cache\:\:RedisLegacyCacheStore\(String\) redis=#<Redis\:\:PooledClient\:0x.*expires_in=12:00:00.*namespace=\"myapp-cache\">\z/
         )
       end
 
       it "#redis" do
-        store = Cache::RedisLegacyCacheStore(String, String).new(expires_in: 12.hours)
+        store = Cache::RedisLegacyCacheStore(String).new(expires_in: 12.hours)
         store.redis.should be_a(Redis::PooledClient)
       end
 
       it "#expires_in" do
-        store = Cache::RedisLegacyCacheStore(String, String).new(expires_in: 12.hours)
+        store = Cache::RedisLegacyCacheStore(String).new(expires_in: 12.hours)
         store.expires_in.should eq(12.hours)
       end
 
       it "#namespace" do
-        store = Cache::RedisLegacyCacheStore(String, String).new(expires_in: 12.hours, namespace: "myapp-cache")
+        store = Cache::RedisLegacyCacheStore(String).new(expires_in: 12.hours, namespace: "myapp-cache")
         store.namespace.should eq("myapp-cache")
       end
     end
 
     it "write to cache first time" do
-      store = Cache::RedisLegacyCacheStore(String, String).new(12.hours)
+      store = Cache::RedisLegacyCacheStore(String).new(12.hours)
 
       value = store.fetch("foo") { "bar" }
       value.should eq("bar")
     end
 
     it "fetch from cache" do
-      store = Cache::RedisLegacyCacheStore(String, String).new(12.hours)
+      store = Cache::RedisLegacyCacheStore(String).new(12.hours)
 
       value = store.fetch("foo") { "bar" }
       value.should eq("bar")
@@ -81,7 +81,7 @@ describe Cache do
 
     it "fetch from cache with custom Redis" do
       redis = Redis.new(host: "localhost", port: 6379)
-      store = Cache::RedisLegacyCacheStore(String, String).new(expires_in: 12.hours, cache: redis)
+      store = Cache::RedisLegacyCacheStore(String).new(expires_in: 12.hours, cache: redis)
 
       value = store.fetch("foo") { "bar" }
       value.should eq("bar")
@@ -91,7 +91,7 @@ describe Cache do
     end
 
     it "don't fetch from cache if expired" do
-      store = Cache::RedisLegacyCacheStore(String, String).new(1.seconds)
+      store = Cache::RedisLegacyCacheStore(String).new(1.seconds)
 
       value = store.fetch("foo") { "bar" }
       value.should eq("bar")
@@ -103,7 +103,7 @@ describe Cache do
     end
 
     it "fetch with expires_in from cache" do
-      store = Cache::RedisLegacyCacheStore(String, String).new(1.seconds)
+      store = Cache::RedisLegacyCacheStore(String).new(1.seconds)
 
       value = store.fetch("foo", expires_in: 1.hours) { "bar" }
       value.should eq("bar")
@@ -115,7 +115,7 @@ describe Cache do
     end
 
     it "don't fetch with expires_in from cache if expires" do
-      store = Cache::RedisLegacyCacheStore(String, String).new(12.hours)
+      store = Cache::RedisLegacyCacheStore(String).new(12.hours)
 
       value = store.fetch("foo", expires_in: 1.seconds) { "bar" }
       value.should eq("bar")
@@ -127,7 +127,7 @@ describe Cache do
     end
 
     it "write" do
-      store = Cache::RedisLegacyCacheStore(String, String).new(12.hours)
+      store = Cache::RedisLegacyCacheStore(String).new(12.hours)
       store.write("foo", "bar", expires_in: 1.minute)
 
       value = store.fetch("foo") { "bar" }
@@ -135,7 +135,7 @@ describe Cache do
     end
 
     it "rewrite value" do
-      store = Cache::RedisLegacyCacheStore(String, String).new(12.hours)
+      store = Cache::RedisLegacyCacheStore(String).new(12.hours)
       store.write("foo", "bar", expires_in: 1.minute)
       store.write("foo", "baz", expires_in: 1.minute)
 
@@ -144,7 +144,7 @@ describe Cache do
     end
 
     it "read" do
-      store = Cache::RedisLegacyCacheStore(String, String).new(12.hours)
+      store = Cache::RedisLegacyCacheStore(String).new(12.hours)
       store.write("foo", "bar")
 
       value = store.read("foo")
@@ -152,7 +152,7 @@ describe Cache do
     end
 
     it "set a custom expires_in value for entry on write" do
-      store = Cache::RedisLegacyCacheStore(String, String).new(12.hours)
+      store = Cache::RedisLegacyCacheStore(String).new(12.hours)
       store.write("foo", "bar", expires_in: 1.second)
 
       sleep 2.seconds
@@ -162,7 +162,7 @@ describe Cache do
     end
 
     it "delete from cache" do
-      store = Cache::RedisLegacyCacheStore(String, String).new(12.hours)
+      store = Cache::RedisLegacyCacheStore(String).new(12.hours)
 
       value = store.fetch("foo") { "bar" }
       value.should eq("bar")
@@ -176,7 +176,7 @@ describe Cache do
     end
 
     it "deletes all items from the cache" do
-      store = Cache::RedisLegacyCacheStore(String, String).new(12.hours)
+      store = Cache::RedisLegacyCacheStore(String).new(12.hours)
 
       value = store.fetch("foo") { "bar" }
       value.should eq("bar")
@@ -189,7 +189,7 @@ describe Cache do
     end
 
     it "#exists?" do
-      store = Cache::RedisLegacyCacheStore(String, String).new(12.hours)
+      store = Cache::RedisLegacyCacheStore(String).new(12.hours)
 
       store.write("foo", "bar")
 
@@ -198,7 +198,7 @@ describe Cache do
     end
 
     it "#exists? expires" do
-      store = Cache::RedisLegacyCacheStore(String, String).new(1.second)
+      store = Cache::RedisLegacyCacheStore(String).new(1.second)
 
       store.write("foo", "bar")
 
@@ -208,7 +208,7 @@ describe Cache do
     end
 
     it "#increment" do
-      store = Cache::RedisLegacyCacheStore(String, Int32).new(12.hours)
+      store = Cache::RedisLegacyCacheStore(Int32).new(12.hours)
 
       store.write("num", 1)
       store.increment("num", 1)
@@ -219,7 +219,7 @@ describe Cache do
     end
 
     it "#decrement" do
-      store = Cache::RedisLegacyCacheStore(String, Int32).new(12.hours)
+      store = Cache::RedisLegacyCacheStore(Int32).new(12.hours)
 
       store.write("num", 2)
       store.decrement("num", 1)
@@ -230,7 +230,7 @@ describe Cache do
     end
 
     it "#increment non-existent value" do
-      store = Cache::RedisLegacyCacheStore(String, Int32).new(12.hours)
+      store = Cache::RedisLegacyCacheStore(Int32).new(12.hours)
 
       store.increment("undef_num", 1)
 
@@ -240,7 +240,7 @@ describe Cache do
     end
 
     it "clear" do
-      store = Cache::RedisLegacyCacheStore(String, String).new(12.hours)
+      store = Cache::RedisLegacyCacheStore(String).new(12.hours)
 
       store.write("foo", "bar", expires_in: 1.minute)
 
@@ -252,7 +252,7 @@ describe Cache do
 
     context "with namespace" do
       it "write" do
-        store = Cache::RedisLegacyCacheStore(String, String).new(12.hours, namespace: "myapp-cache")
+        store = Cache::RedisLegacyCacheStore(String).new(12.hours, namespace: "myapp-cache")
         store.write("foo", "bar", expires_in: 1.minute)
 
         value = store.fetch("foo") { "bar" }
@@ -260,8 +260,8 @@ describe Cache do
       end
 
       it "clear" do
-        store = Cache::RedisLegacyCacheStore(String, String).new(12.hours, namespace: "myapp-cache")
-        other_store = Cache::RedisLegacyCacheStore(String, String).new(12.hours, namespace: "other-cache")
+        store = Cache::RedisLegacyCacheStore(String).new(12.hours, namespace: "myapp-cache")
+        other_store = Cache::RedisLegacyCacheStore(String).new(12.hours, namespace: "other-cache")
 
         1001.times do |i|
           store.write("#{i + 1}", "bar", expires_in: 1.minute)
