@@ -12,10 +12,6 @@ dependencies:
     github: stefanwille/crystal-redis
     version: ">= 2.8.0"
 
-development_dependencies:
-  ameba:
-    github: crystal-ameba/ameba
-
 crystal: ">= 1.0.0"
 
 license: MIT
